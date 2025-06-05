@@ -1,0 +1,15 @@
+[project]
+name = "my-bot"
+version = "1.0"
+description = "First telegram_gpt_integrated_bot"
+authors = [
+    {name = "apostolruslan", email = "apostolruslan.python@gmail.com"}
+]
+license = {text = "Apache License 2.0"}
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "python-telegram-bot (>=22.1,<23.0)",
+    "openai (>=1.84.0,<2.0.0)",
+    "python-dotenv (>=1.1.0,<2.0.0)"
+]
