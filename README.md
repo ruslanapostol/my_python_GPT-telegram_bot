@@ -1,64 +1,42 @@
-# my_python_GPT-telegram_bot
+# GPT Telegram Bot (MVP) / Телеграм-бот с GPT (MVP)
 
-A Telegram bot powered by ChatGPT, built with Python and [python-telegram-bot](https://python-telegram-bot.org), managed with [Poetry](https://python-poetry.org/).
+A simple Telegram bot powered by OpenAI's GPT.  
+Простой Telegram-бот на основе OpenAI GPT.
 
-Телеграм-бот с поддержкой ChatGPT, написанный на Python с использованием [python-telegram-bot](https://python-telegram-bot.org) и управляемый с помощью [Poetry](https://python-poetry.org/).
-
----
-
-## Features / Основные возможности
-
-- Integrates with ChatGPT (OpenAI API)
-- Several bot commands: `/random`, `/gpt`, `/talk`, `/quiz` and more
-- Environment variable support with `.env`
-- Modular and easy-to-extend codebase
-- (Optional) **NLP Features:** Translation, summarization, sentiment analysis, and more
-
-- Интеграция с ChatGPT (OpenAI API)
-- Несколько команд бота: `/random`, `/gpt`, `/talk`, `/quiz` и другие
-- Работа с переменными окружения через `.env`
-- Модульная и легко расширяемая архитектура
-- (Опционально) **NLP-функции:** перевод, резюмирование, анализ настроения и др.
+Built as an MVP project for my Python course, with a clean modular structure and easy extension for NLP features.  
+Создан как MVP-проект для моего курса по Python. Структура модульная и легко расширяется для NLP-функций.
 
 ---
 
-## Requirements / Требования
+## 📋 Features / Функционал
 
-- Python 3.10+ (рекомендуется Python 3.13)
-- Poetry (для управления зависимостями)
-- Telegram Bot Token ([получить через @BotFather](https://core.telegram.org/bots#botfather))
-- OpenAI API Key ([зарегистрироваться здесь](https://platform.openai.com/signup))
+- `/start` — Welcome message and bot introduction  
+  Приветствие и знакомство с ботом
 
----
+- `/help` — List of available commands  
+  Список доступных команд
 
-## Quick Start / Быстрый старт
+- `/about` — Project and author info  
+  Информация о проекте и авторе
 
-1. **Clone the repository / Клонируйте репозиторий**
-    ```bash
-    git clone https://github.com/yourusername/my_python_GPT-telegram_bot.git
-    cd my_python_GPT-telegram_bot
-    ```
+- `/random` — Sends a random fun fact  
+  Присылает случайный интересный факт
 
-2. **Install dependencies with Poetry / Установите зависимости через Poetry**
-    ```bash
-    poetry install
-    ```
+- `/gpt` — Ask any question and get an answer from ChatGPT (in progress)  
+  Задать любой вопрос и получить ответ от ChatGPT (в разработке)
 
-3. **Copy `.env.example` to `.env` and set your secrets / Скопируйте `.env.example` в `.env` и укажите свои токены**
-    ```bash
-    cp .env.example .env
-    ```
-    Fill in your `TELEGRAM_TOKEN` and `OPENAI_API_KEY` inside `.env`.
-    Впишите свои значения для `TELEGRAM_TOKEN` и `OPENAI_API_KEY` в файл `.env`.
+- `/talk` — Dialog with a famous personality (in progress)  
+  Диалог с известной личностью (в разработке)
 
-4. **Run the bot / Запустите бота**
-    ```bash
-    poetry run python -m bot.main
-    ```
+- `/quiz` — Take a quiz and check your knowledge (in progress)  
+  Викторина для проверки знаний (в разработке)
 
 ---
 
-## Environment Variables / Переменные окружения
+## 🚀 Getting Started / Начало работы
 
-`.env` file should contain your tokens:
-`.env` файл должен содержать ваши токены:
+### 1. **Clone the repository / Клонировать репозиторий**
+
+```bash
+git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+cd YOUR_REPO_NAME
