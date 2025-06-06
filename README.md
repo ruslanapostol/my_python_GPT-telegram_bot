@@ -1,7 +1,10 @@
 # GPT Telegram Bot (MVP) / Телеграм-бот с GPT (MVP)
 
-A simple Telegram bot powered by OpenAI's GPT.  
-Простой Telegram-бот на основе OpenAI GPT.
+![Python](https://img.shields.io/badge/python-3.10+-blue)
+![License](https://img.shields.io/badge/license-Apache%202.0-blue)
+
+A simple Telegram bot powered by OpenAI's GPT and written in Python 3. Modular, easy to extend, and built for learning.  
+Бот для Telegram на Python 3 с поддержкой OpenAI GPT. Модульная структура, легкость расширения, фокус на обучении.
 
 Built as an MVP project for my Python course, with a clean modular structure and easy extension for NLP features.  
 Создан как MVP-проект для моего курса по Python. Структура модульная и легко расширяется для NLP-функций.
