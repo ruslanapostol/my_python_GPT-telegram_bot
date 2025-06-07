@@ -25,7 +25,7 @@ def load_facts():
 FACTS = load_facts()
 
 
-async def random_fact(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def random_fact(update: Update, _context: ContextTypes.DEFAULT_TYPE):
     fact = random.choice(FACTS)
     logger.info(f"/random fact sent to {update.effective_user.id}")
     await update.message.reply_text(f"🧠 {fact}")

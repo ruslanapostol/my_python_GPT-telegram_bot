@@ -3,7 +3,7 @@ import os
 
 
 openai.api_key = os.getenv("CHATGPT_TOKEN")
-print("DEBUG TOKEN: ", repr(openai.api_key))
+
 
 
 async def ask_chatgpt(prompt: str, model="gpt-3.5-turbo") -> str:

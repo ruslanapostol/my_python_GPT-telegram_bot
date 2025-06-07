@@ -4,7 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def start(update: Update, _context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     logger.info(f"/start received from {user.id} ({user.username})")
     await update.message.reply_text(
@@ -16,7 +16,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/help — справка"
     )
 
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def help_command(update: Update, _context: ContextTypes.DEFAULT_TYPE):
     logger.info(f"/help received by {update.effective_user.id}")
     await update.message.reply_text(
         "Доступные команды:\n"
@@ -28,7 +28,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/help — эта справка"
     )
 
-async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def about(update: Update, _context: ContextTypes.DEFAULT_TYPE):
     logger.info(f"/about received by {update.effective_user.id}")
     await update.message.reply_text(
         "Этот бот использует ChatGPT для ответов на ваши вопросы и развлечений.\n"

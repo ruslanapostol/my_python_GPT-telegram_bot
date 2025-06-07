@@ -5,12 +5,12 @@ from bot.services.openai_service import ask_chatgpt
 ASKING = range(1)
 
 
-async def gpt_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def gpt_command(update: Update, _context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Напиши свой вопрос для ChatGPT или /cancel для выхода:")
     return ASKING
 
 
-async def gpt_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def gpt_ask(update: Update, _context: ContextTypes.DEFAULT_TYPE):
     user_input = update.message.text
     await update.message.reply_text("Запрашиваю ответ у ChatGPT...")
     answer = await ask_chatgpt(user_input)
@@ -18,7 +18,7 @@ async def gpt_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ConversationHandler.END
 
 
-async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cancel(update: Update, _context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Диалог с ChatGPT отменён.")
     return ConversationHandler.END
 
