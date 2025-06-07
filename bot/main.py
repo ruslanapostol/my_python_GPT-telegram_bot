@@ -1,8 +1,9 @@
 import logging
 from telegram.ext import Application, CommandHandler
-from config import TG_BOT_TOKEN
-from handlers.basic import start, help_command, about
-from handlers.random_fact import random_fact
+from bot.config import TG_BOT_TOKEN
+from bot.handlers.basic import start, help_command, about
+from bot.handlers.random_fact import random_fact
+from bot.handlers.gpt_chat import gpt_conversation
 
 logging.basicConfig(
     format='%(asctime)s  [%(levelname)s]  %(name)s: %(message)s',
@@ -15,17 +16,19 @@ def main():
     logger.info("Starting bot...")
 
     try:
+
         application = Application.builder().token(TG_BOT_TOKEN).build()
 
         application.add_handler(CommandHandler("start", start))
         application.add_handler(CommandHandler("help", help_command))
         application.add_handler(CommandHandler("about", about))
         application.add_handler(CommandHandler("random", random_fact))
+        application.add_handler(gpt_conversation)
 
         logger.info("Bot is polling for updates...")
         application.run_polling()
         
-    except Exception as e:
+    except Exception:
         logger.exception("An error occurred while running the bot:")
 
 
