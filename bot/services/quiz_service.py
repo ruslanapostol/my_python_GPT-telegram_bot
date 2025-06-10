@@ -13,6 +13,9 @@ class QuizService:
         self.questions = self.load_questions()
 
     def load_questions(self) -> List[Dict[str, Any]]:
+        """
+        Loads quiz questions from a JSON file.
+        """
         try:
             with open(self.questions_file, "r", encoding="utf-8") as file:
                 questions = json.load(file)
@@ -24,14 +27,39 @@ class QuizService:
             logger.error(f"Error loading quiz questions: {e}")
             return []
 
-    def get_random_question(self) -> Optional[Dict[str, Any]]:
+    def get_random_question(self, exclude: Optional[str] = None) -> Optional[Dict[str, Any]]:
+        """
+            Return a random question not in the exclude list.
+            If all questions have been asked, return None to indicate quiz completion.
+            """
         if not self.questions:
             return None
-        return random.choice(self.questions)
+
+        available = (
+            [q for q in self.questions if q["question"] not in exclude]
+            if exclude else self.questions
+        )
+        return random.choice(available) if available else None
 
     @staticmethod
     def check_answer(user_answer: str, correct_answer: str) -> bool:
-        return user_answer.strip().lower() == correct_answer.strip().lower()
+        """
+               Accepts:
+                1. Full exact match: "Уильям Шекспир"
+                2. Single-word match: either "Уильям" or "Шекспир"
+               Rejects any multi-word answer that isn't the exact full name.
+               """
+        ua = user_answer.strip().lower()
+        ca = correct_answer.strip().lower()
+
+        if ua == ca:
+            return True
+
+        ua_words = ua.split()
+        ca_words = ca.split()
+        if len(ua_words) == 1 and ua_words[0] in ca_words:
+            return True
+        return False
 
 
 QUIZ_FILE = os.path.abspath(
