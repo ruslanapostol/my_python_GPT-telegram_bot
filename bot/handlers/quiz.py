@@ -1,4 +1,5 @@
 import logging
+import random
 from telegram import Update, ReplyKeyboardRemove
 from telegram.ext import (
     ContextTypes,
@@ -9,13 +10,34 @@ from telegram.ext import (
 )
 from bot.services.quiz_service import quiz_service
 from bot.utils.keyboards import quiz_retry_keyboard
+from bot.utils.texts import QUESTION_INTROS, COMPLIMENTS, FAILURES, FAREWELLS, HIGH_SCORE, LOW_SCORE
+
 
 logger = logging.getLogger(__name__)
+
 ASKING, RETRY = range(2)
 
+def get_farewell(score: int, total: int) -> str:
+    """
+    Returns a dynamic farewell/summary message based on score.
+     - Perfect or >= half correct: High score praise.
+    - Less than half: Gentle encouragement.
+    - Zero: Motivational message.
+    """
+    if score == 0:
+        return random.choice(LOW_SCORE)
+    elif score == total:
+        return random.choice(HIGH_SCORE)
+    elif score >= total // 2:
+        return random.choice(HIGH_SCORE)
+    else:
+        return random.choice(LOW_SCORE)
 
 async def quiz_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Starts the quiz session and sends the first question."""
+    """
+    Starts the quiz session and sends the first question.
+    Clears user session data to prevent interference with previous quizz sessions.
+    """
     user = update.effective_user
     context.user_data.clear()
     context.user_data['score'] = 0
@@ -26,30 +48,32 @@ async def quiz_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 async def send_new_question(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Selects and sends a new quiz question without repeats."""
-    asked = context.user_data.get('asked_questions', [])
-
-    question = quiz_service.get_random_question(exclude=asked)
+    asked_questions = context.user_data.get('asked_questions', [])
+    question = quiz_service.get_random_question(exclude=asked_questions)
     if question is None:
         score = context.user_data.get('score', 0)
+        total_questions = len(asked_questions)
+        farewell = get_farewell(score, total_questions)
         await update.message.reply_text(
-            f"Викторина завершена! Ваш итоговый счет: {score}",
+             f"Викторина завершена! Ваш итоговый счет: {score} из {total_questions}.\n{farewell}",
             reply_markup=ReplyKeyboardRemove()
         )
         return ConversationHandler.END
 
-    asked.append(question["question"])
-    context.user_data["asked_questions"] = asked
+    asked_questions.append(question["question"])
+    context.user_data["asked_questions"] = asked_questions
     context.user_data["current_question"] = question
 
+    intro = random.choice(QUESTION_INTROS)
     await update.message.reply_text(
-        f"Вопрос: {question['question']}",
+        f"{intro}\nВопрос: {question['question']}",
         reply_markup=ReplyKeyboardRemove()
     )
     return ASKING
 
 
 async def quiz_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Checks the user's answer and either advances the quiz or shows retry options."""
+    """Checks the user's answer and handles correct/incorrect flow."""
     user = update.effective_user
     user_answer = update.message.text.strip()
     question = context.user_data.get('current_question')
@@ -60,20 +84,20 @@ async def quiz_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     correct_answer = question['answer']
     is_correct = quiz_service.check_answer(user_answer, correct_answer)
-    logger.info(
-        f"User {user.id} answered '{user_answer}' (expected '{correct_answer}'): {is_correct}"
-    )
+    logger.info( f"User {user.id} answered '{user_answer}' (expected '{correct_answer}'): {is_correct}")
 
     if is_correct:
         context.user_data["score"] += 1
+        compliment = random.choice(COMPLIMENTS)
         await update.message.reply_text(
-            f"✅ Верно! Ваш счет: {context.user_data['score']}.\nСледующий вопрос:",
+             f"✅ {compliment} Твой счет: {context.user_data['score']}.\nСледующий вопрос:",
             reply_markup=ReplyKeyboardRemove()
         )
         return await send_new_question(update, context)
     else:
+        failure = random.choice(FAILURES)
         await update.message.reply_text(
-            "❌ Неправильно. Попробуй еще или возьми новый вопрос.",
+            f"❌ {failure} Можешь попробовать ещё раз или взять новый вопрос.",
             reply_markup=quiz_retry_keyboard()
         )
         return RETRY
@@ -104,12 +128,16 @@ async def quiz_retry(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 
 async def quiz_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Ends the quiz and displays the final score."""
+    """Ends the quiz and displays the final score with a dynamic message."""
     user = update.effective_user
     score = context.user_data.get('score', 0)
+    total_questions = len(context.user_data.get('asked_questions', []))
     logger.info(f"Quiz cancelled by {user.id}. Final score: {score}")
+
+    farewell = get_farewell(score, total_questions)
+
     await update.message.reply_text(
-        f"Викторина завершена! Ваш результат: {score}",
+        f"Викторина завершена! Ваш результат: {score} из {total_questions}.\n{farewell}",
         reply_markup=ReplyKeyboardRemove()
     )
     return ConversationHandler.END
