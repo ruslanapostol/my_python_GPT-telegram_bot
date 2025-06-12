@@ -45,3 +45,14 @@ def quiz_retry_keyboard():
         resize_keyboard=True,
         one_time_keyboard=True
     )
+
+def quiz_question_keyboard():
+    """
+    Клавиатура для основного вопроса викторины — только кнопка 'Закончить викторину'.
+    :return: ReplyKeyboardMarkup object
+    """
+    return ReplyKeyboardMarkup(
+        [[KeyboardButton("Закончить викторину")]],
+        resize_keyboard=True,
+        one_time_keyboard=True
+    )

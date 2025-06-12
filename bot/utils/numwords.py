@@ -3,21 +3,20 @@ Number-word normalization for Russian and English.
 Converts words like 'восьми', 'четыре', 'eight' → '8', '4', '8', etc.
 """
 
-import unicodedata
 import re
 
 RUSSIAN_NUM_WORDS = {
-    "0": ["ноль"],
-    "1": ["один", "одна", "одно", "одну"],
-    "2": ["два", "две", "двух", "двум", "двумя"],
-    "3": ["три", "трёх", "тремя", "трое", "триёх"],
-    "4": ["четыре", "четыр", "четырех", "четырём", "четвёртый", "четвертый"],
-    "5": ["пять", "пяти", "пятью"],
-    "6": ["шесть", "шести", "шестью"],
-    "7": ["семь", "семи", "семью"],
-    "8": ["восемь", "восьм", "восьми", "восьмой", "восьмью"],
-    "9": ["девять", "девяти", "девятью"],
-    "10": ["десять", "десяти", "десятью"]
+    "0": ["ноль", "нуля", "нулю", "нулём", "нуле"],
+    "1": ["один", "одна", "одно", "одну", "одного", "одному", "одним", "одне", "первый", "первого"],
+    "2": ["два", "две", "двух", "двум", "двумя", "второй", "второго"],
+    "3": ["три", "трёх", "трем", "тремя", "трижды", "третий", "третьего"],
+    "4": ["четыре", "четырёх", "четырём", "четырьмя", "четвертый", "четвертого"],
+    "5": ["пять", "пяти", "пятому", "пятью", "пятый", "пятого"],
+    "6": ["шесть", "шести", "шестому", "шестью", "шестой", "шестого"],
+    "7": ["семь", "семи", "седьмой", "седьмого", "семью"],
+    "8": ["восемь", "восьми", "восьмой", "восьмого", "восемью"],
+    "9": ["девять", "девяти", "девятому", "девятью", "девятый", "девятого"],
+    "10": ["десять", "десяти", "десятому", "десятью", "десятый", "десятого"],
 }
 
 ENGLISH_NUM_WORDS = {
@@ -32,21 +31,23 @@ ENGLISH_NUM_WORDS = {
     "eight": "8",
     "nine": "9",
     "ten": "10",
-    # ...add more if needed
 }
+
+# Build a fast reverse dictionary for Russian forms
+RUSSIAN_WORD_TO_DIGIT = {}
+for digit, forms in RUSSIAN_NUM_WORDS.items():
+    for form in forms:
+        RUSSIAN_WORD_TO_DIGIT[form] = digit
 
 def word_to_number(text: str) -> str:
     """
-    Replaces number words with their digit equivalents (Russian and English).
-    Handles phrases like 'восемь', 'eight', etc.
+    Replace number words (Russian and English, any case/declension) with digits.
     """
-    words = text.lower().split()
-    converted = []
-    for w in words:
-        if w in RUSSIAN_NUM_WORDS:
-            converted.append(RUSSIAN_NUM_WORDS[w])
-        elif w in ENGLISH_NUM_WORDS:
-            converted.append(ENGLISH_NUM_WORDS[w])
-        else:
-            converted.append(w)
-    return ' '.join(converted)
+    text = text.lower()
+    # Replace Russian number words
+    for word, digit in RUSSIAN_WORD_TO_DIGIT.items():
+        text = re.sub(rf"\b{word}\b", digit, text, flags=re.IGNORECASE)
+    # Replace English number words
+    for word, digit in ENGLISH_NUM_WORDS.items():
+        text = re.sub(rf"\b{word}\b", digit, text, flags=re.IGNORECASE)
+    return text
