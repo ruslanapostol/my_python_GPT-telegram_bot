@@ -1,38 +1,36 @@
 # GPT Telegram Bot (MVP) / Телеграм-бот с GPT (MVP)
 
-A simple Telegram bot powered by OpenAI’s GPT and written in Python 3.  
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![License](https://img.shields.io/badge/license-Apache%202.0-blue)
+
+A simple Telegram bot powered by OpenAI's GPT and written in Python 3.  
 Бот для Telegram на Python 3 с поддержкой OpenAI GPT. Модульная структура, легко расширяется.
 
 ---
 
 ## Table of Contents
 
-- [Features / Функционал](#features--функционал)
-- [Installation / Установка](#installation--установка)
-- [Usage / Использование](#usage--использование)
-- [Handler Overview / Обзор обработчиков](#handler-overview--обзор-обработчиков)
-- [Project Structure / Структура проекта](#project-structure--структура-проекта)
-- [License / Лицензия](#license--лицензия)
-- [Author / Автор](#author--автор)
+| English                       | Русский                         |
+|-------------------------------|---------------------------------|
+| [Features](#features)         | [Функционал](#функционал)       |
+| [Installation](#installation) | [Установка](#установка)         |
+| [Usage](#usage)               | [Использование](#использование) |
+| [Handlers](#handlers)         | [Обработчики](#обработчики)     |
+| [Structure](#structure)       | [Структура](#структура)         |
+| [License](#license)           | [Лицензия](#лицензия)           |
+| [Author](#author)             | [Автор](#автор)                 |
 
 ---
 
 ## Features / Функционал
 
-- `/start` — Welcome message  
-  Приветствие и знакомство с ботом
-- `/help` — List of commands  
-  Список доступных команд
-- `/about` — Project and author info  
-  Информация о проекте и авторе
-- `/random` — Random fact (from `assets/facts.txt`)  
-  Случайный интересный факт
-- `/gpt` — ChatGPT Q&A  
-  Вопросы ChatGPT
-- `/quiz` — Knowledge quiz  
-  Викторина
-- `/talk` — Dialog with a famous personality  
-  Диалог с известной личностью
+- `/start` — Welcome message / Приветствие
+- `/help` — List of commands / Доступные команды
+- `/about` — Project info / О проекте
+- `/random` — Random fact / Случайный факт
+- `/gpt` — ChatGPT Q&A / Вопросы к GPT
+- `/quiz` — Quiz / Викторина
+- `/talk` — Persona dialog / Диалог с персонажем
 
 ---
 
@@ -60,7 +58,9 @@ poetry install
 
    ```bash
    poetry run python bot/main.py
+   ```
    # или
+   ```
    python -m bot.main
    ```
 
