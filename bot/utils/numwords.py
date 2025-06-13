@@ -1,6 +1,7 @@
 """
 Number-word normalization for Russian and English.
-Converts words like 'восьми', 'четыре', 'eight' → '8', '4', '8', etc.
+Модуль для преобразования числительных-слов (например, 'восьми', 'four')
+в числовые значения ('8', '4') для обработки ответов на викторину.
 """
 
 import re
@@ -41,10 +42,17 @@ for digit, forms in RUSSIAN_NUM_WORDS.items():
 
 def word_to_number(text: str) -> str:
     """
-    Replace number words (Russian and English, any case/declension) with digits.
+    Replace number-words in Russian or English with their digit equivalents.
+
+    Example: 'восьми', 'eight' → '8'.
+    Handles all Russian cases/declensions, and English numbers.
+    Works for quiz answers, questions, or anywhere a user may type a number as a word.
+
+    :param text: Input string possibly containing number-words.
+    :return: String with numbers normalized (digits instead of words).
     """
     text = text.lower()
-    # Replace Russian number words
+
     for word, digit in RUSSIAN_WORD_TO_DIGIT.items():
         text = re.sub(rf"\b{word}\b", digit, text, flags=re.IGNORECASE)
     # Replace English number words

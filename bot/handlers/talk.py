@@ -1,6 +1,6 @@
 """
 Conversation handler for /talk command.
-Lets the user choose a famous persona and chat as if the personaa were replying.
+Lets the user choose a famous persona and chat as if the persona were replying.
 Handles persona selection, main conversation loop, and graceful exit.
 """
 
@@ -20,7 +20,10 @@ CHOOSING_PERSONA, TALKING = range(2)
 
 
 async def talk_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Entry point for /talk. Shows available personas to the user and starts the conversation."""
+    """
+    Entry point for /talk.
+    Shows available personas to the user and starts the conversation.
+    """
     personas = persona_service.get_personas()
     if not personas:
         logger.error(f"No personas available for user {update.effective_user.id} ({update.effective_user.username})")
@@ -37,7 +40,9 @@ async def talk_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def persona_chosen(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handles the user's persona selection and transitions to the chat state."""
+    """
+    Handles persona selection; sets persona in user_data and transitions to chat.
+    """
     persona_name = update.message.text.strip()
     if persona_name == "Закончить":
         return await talk_cancel(update, context)
@@ -64,8 +69,8 @@ async def persona_chosen(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def persona_talk(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
-    Handles the user's messages to the selected persona, routes via ChatGPT, and replies.
-     If no persona is selected, restarts the persona selection process.
+    Handles user messages, passes them to ChatGPT as the persona, and replies.
+    If no persona is selected, it prompts the user to re-select.
     """
     text = update.message.text.strip()
     if text == "Закончить":
@@ -97,7 +102,9 @@ async def persona_talk(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def talk_cancel(update: Update, _context: ContextTypes.DEFAULT_TYPE):
-    """Gracefully ends the conversation and removes the custom keyboard."""
+    """
+    Gracefully ends the conversation and removes the custom keyboard.
+    """
     await update.message.reply_text(
         "Режим общения с персонажем завершён.",
         parse_mode=ParseMode.HTML,

@@ -95,6 +95,55 @@ bot/
 
 ---
 
+
+## Data Files / Данные
+
+1. `personas.json`
+   List of available personas for /talk. Each persona has a name and a prompt that sets up ChatGPT’s character.
+Format:
+[
+  {
+    "name": "Persona Name",
+    "prompt": "Instructions for ChatGPT in the persona's style"
+  },
+  ...
+]
+Example:
+[
+  {
+    "name": "Albert Einstein",
+    "prompt": "You are Albert Einstein, famous physicist. Always answer in the first person..."
+  }
+]
+Русский:
+Список доступных персонажей для команды /talk. 
+Каждый объект должен содержать поля name (имя) и prompt (стиль/характер для ChatGPT).
+
+2.` quiz_questions.json`
+Quiz questions for /quiz. Each entry has a question and the correct answer.
+Format:
+[
+  {
+    "question": "Your question here",
+    "answer": "Correct answer"
+  },
+  ...
+]
+Example:
+[
+  {
+    "question": "What is the capital of France?",
+    "answer": "Paris"
+  },
+  {
+    "question": "2 + 2?",
+    "answer": "4"
+  }
+]
+Русский:
+Вопросы для викторины /quiz. Каждый объект — это пара question (вопрос) и answer (правильный ответ).
+
+
 ## License / Лицензия
 
 Apache License 2.0

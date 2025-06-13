@@ -12,12 +12,16 @@ logger = logging.getLogger(__name__)
 
 
 class QuizService:
+    """Service for loading, selecting, and checking quiz questions/answers."""
     def __init__(self, questions_file: str):
         self.questions_file = questions_file
         self.questions = self.load_questions()
 
     def load_questions(self) -> List[Dict[str, Any]]:
-        """Loads quiz questions from a JSON file."""
+        """
+        Loads quiz questions from a JSON file (expects a list of dicts with 'question' and 'answer').
+        Returns an empty list on error.
+        """
         try:
             with open(self.questions_file, "r", encoding="utf-8") as file:
                 questions = json.load(file)
@@ -45,7 +49,13 @@ class QuizService:
 
     @staticmethod
     def normalize(text: str) -> str:
-        """Lowercase, strip, remove accents, keep spaces for word matching."""
+        """
+        Normalizes text for comparison:
+        - lowercases, strips
+        - removes accents (unicode normalization)
+        - removes punctuation/non-alphanum
+        """
+
         text = text.lower().strip()
         text = ''.join(
             c for c in unicodedata.normalize('NFD', text)
@@ -55,7 +65,13 @@ class QuizService:
 
     @staticmethod
     def check_answer(user_answer: str, correct_answer: str) -> bool:
-        """Smart matching for quiz answers."""
+        """
+        Smart matching:
+        - Handles number words (e.g., "восьми", "eight" → 8)
+        - Ignores case and punctuation
+        - Accepts partial answers if all words are present
+        - Fuzzy matches for minor typos
+        """
         ua = word_to_number(user_answer)
         ca = word_to_number(correct_answer)
 

@@ -15,10 +15,10 @@ logger = logging.getLogger(__name__)
 
 
 def main():
+    """Entry point: sets up handlers, runs the bot, handles top-level errors."""
     logger.info("Starting bot...")
 
     try:
-
         application = Application.builder().token(TG_BOT_TOKEN).build()
 
         application.add_handler(CommandHandler("start", start))

@@ -1,3 +1,8 @@
+"""
+Main command handlers for my_python_GPT Telegram bot.
+Provides: /start, /help, /about
+"""
+
 from telegram import Update
 from telegram.ext import ContextTypes
 import logging
@@ -8,6 +13,10 @@ import os
 logger = logging.getLogger(__name__)
 
 async def start(update: Update, _context: ContextTypes.DEFAULT_TYPE):
+    """
+    Handler for the /start command.
+    Greets the user, sends a Garfield GIF, and lists available commands.
+    """
     user = update.effective_user
     logger.info(f"/start received from {user.id} ({user.username})")
 
@@ -31,6 +40,10 @@ async def start(update: Update, _context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def help_command(update: Update, _context: ContextTypes.DEFAULT_TYPE):
+    """
+    Handler for the /help command.
+    Lists all available bot commands.
+    """
     logger.info(f"/help received by {update.effective_user.id}")
     await update.message.reply_text(
         "Доступные команды:\n"
@@ -43,6 +56,10 @@ async def help_command(update: Update, _context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def about(update: Update, _context: ContextTypes.DEFAULT_TYPE):
+    """
+    Handler for the about command.
+    Describes the project and its author.
+    """
     logger.info(f"/about received by {update.effective_user.id}")
     await update.message.reply_text(
         "Этот бот использует ChatGPT для ответов на ваши вопросы и развлечений.\n"

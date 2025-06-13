@@ -35,7 +35,11 @@ ASKING, RETRY = range(2)
 
 
 def get_farewell(score: int, total: int) -> str:
-    """Returns a dynamic farewell/summary message based on score."""
+    """Returns a dynamic farewell/summary message based on score.
+    - HIGH_SCORE: for perfect scores
+    - LOW_SCORE: for 0 or low scores
+    - FAREWELLS: for "in-between" results
+    """
     if score == 0:
         return random.choice(LOW_SCORE)
     elif score == total and total > 0:
@@ -47,7 +51,10 @@ def get_farewell(score: int, total: int) -> str:
 
 
 async def send_perfect_score_image(update: Update) -> None:
-    """Sends a celebratory GIF or image for perfect quiz results."""
+    """
+    Sends a celebratory GIF or image for perfect quiz results.
+    Used at the end of the quiz if all questions are answered correctly.
+    """
     try:
         logger.info("Trying to send perfect score GIF...")
         with open("bot/assets/rolling_garfield.gif", "rb") as gif:
@@ -76,7 +83,10 @@ async def quiz_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 async def send_new_question(update: Update, context: ContextTypes.DEFAULT_TYPE,
                             last_answer_correct: bool = False) -> int:
-    """Selects and sends a new quiz question, handles compliments, and manages quiz ending."""
+    """
+    Selects and sends a new quiz question.
+    Ends the quiz if no more questions remain (perfect score triggers a GIF).
+    """
     asked_questions = context.user_data.get('asked_questions', [])
     question = quiz_service.get_random_question(exclude=asked_questions)
 
@@ -113,8 +123,10 @@ async def send_new_question(update: Update, context: ContextTypes.DEFAULT_TYPE,
 
 
 async def quiz_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Checks the user's answer and handles correct/incorrect flow.
-    Allow quitting the quiz via keywords"""
+    """
+    Checks the user's answer and handles correct/incorrect flow.
+    Allow quitting the quiz via keywords
+    """
     user = update.effective_user
     user_answer = update.message.text.strip()
     text = user_answer.lower()
@@ -148,7 +160,10 @@ async def quiz_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 
 async def quiz_retry(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Handles the user's choice to retry the same question or get a new one."""
+    """
+    Handles the user's choice to retry the same question or get a new one.
+    Also allows quitting from the retry state.
+    """
     text = update.message.text.strip().lower()
     if text in END_QUIZ_BUTTONS:
         return await quiz_cancel(update, context)
@@ -175,7 +190,10 @@ async def quiz_retry(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 
 async def quiz_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Ends the quiz and displays the final score with a dynamic message."""
+    """
+    Ends the quiz and displays the final score with a dynamic message.
+    Sends a GIF if the user achieved a perfect score.
+    """
     user = update.effective_user
     score = context.user_data.get('score', 0)
     total_questions = len(context.user_data.get('asked_questions', []))
