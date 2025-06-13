@@ -45,38 +45,32 @@ class QuizService:
 
     @staticmethod
     def normalize(text: str) -> str:
-        """Lowercase, strip, remove accents, and punctuation."""
+        """Lowercase, strip, remove accents, keep spaces for word matching."""
         text = text.lower().strip()
         text = ''.join(
             c for c in unicodedata.normalize('NFD', text)
             if unicodedata.category(c) != 'Mn'
         )
-        return re.sub(r'[^a-zа-яё0-9]+', '', text, flags=re.IGNORECASE)
+        return re.sub(r'[^a-zа-яё0-9 ]+', '', text, flags=re.IGNORECASE)
 
     @staticmethod
     def check_answer(user_answer: str, correct_answer: str) -> bool:
-        """
-        Smarter matching:
-        - Converts number words to digits for Russian/English.
-        - Ignores case and punctuation.
-        - Accepts partial answers if all words are present in the correct answer.
-        - Fuzzy match fallback for typos.
-        """
+        """Smart matching for quiz answers."""
         ua = word_to_number(user_answer)
         ca = word_to_number(correct_answer)
-        
+
         ua_norm = QuizService.normalize(ua)
         ca_norm = QuizService.normalize(ca)
 
         if ua_norm == ca_norm:
             return True
 
-        ua_words = set(re.findall(r'[a-zа-яё0-9]+', ua_norm, flags=re.IGNORECASE))
-        ca_words = set(re.findall(r'[a-zа-яё0-9]+', ca_norm, flags=re.IGNORECASE))
+        ua_words = set(ua_norm.split())
+        ca_words = set(ca_norm.split())
         if ua_words and ua_words.issubset(ca_words):
             return True
 
-        return difflib.SequenceMatcher(None, ua_norm, ca_norm).ratio() > 0.77
+        return difflib.SequenceMatcher(None, ua_norm, ca_norm).ratio() > 0.7
 
 
 QUIZ_FILE = os.path.abspath(

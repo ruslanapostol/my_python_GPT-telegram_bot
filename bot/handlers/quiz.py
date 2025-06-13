@@ -1,6 +1,8 @@
 import logging
 import random
+
 from telegram import Update, ReplyKeyboardRemove
+from telegram.constants import ParseMode
 from telegram.ext import (
     ContextTypes,
     CommandHandler,
@@ -8,10 +10,24 @@ from telegram.ext import (
     ConversationHandler,
     filters
 )
+
 from bot.services.quiz_service import quiz_service
+from bot.utils.constants import (
+    RETRY_BUTTON_LABEL,
+    NEW_Q_BUTTON_LABEL,
+    RETRY_BUTTONS,
+    NEW_Q_BUTTONS,
+    END_QUIZ_BUTTONS,
+)
 from bot.utils.keyboards import quiz_retry_keyboard, quiz_question_keyboard
-from bot.utils.texts import QUESTION_INTROS, COMPLIMENTS, FAILURES, HIGH_SCORE, LOW_SCORE
-from telegram.constants import ParseMode
+from bot.utils.texts import (
+    QUESTION_INTROS,
+    COMPLIMENTS,
+    FAILURES,
+    HIGH_SCORE,
+    LOW_SCORE,
+    FAREWELLS,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -22,18 +38,33 @@ def get_farewell(score: int, total: int) -> str:
     """Returns a dynamic farewell/summary message based on score."""
     if score == 0:
         return random.choice(LOW_SCORE)
-    elif score == total:
+    elif score == total and total > 0:
         return random.choice(HIGH_SCORE)
-    elif score >= total // 2:
-        return "Хороший результат — тренируйся ещё!"
+    elif score >= max(2, total // 2):
+        return random.choice(FAREWELLS)
     else:
         return random.choice(LOW_SCORE)
+
+
+async def send_perfect_score_image(update: Update) -> None:
+    """Sends a celebratory GIF or image for perfect quiz results."""
+    try:
+        logger.info("Trying to send perfect score GIF...")
+        with open("bot/assets/rolling_garfield.gif", "rb") as gif:
+            logger.info("GIF file opened successfully, sending...")
+            await update.message.reply_animation(
+                gif,
+                caption="Ты победил(а) эту викторину. Бедные вопросы даже не успели испугаться!",
+                parse_mode=ParseMode.HTML,
+            )
+    except Exception as e:
+        logger.warning(f"Could not send winner gif: {e}")
 
 
 async def quiz_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """
     Starts the quiz session and sends the first question.
-    Clears user session data to prevent interference with previous quizz sessions.
+    Clears user session data to prevent interference with previous quiz sessions.
     """
     user = update.effective_user
     context.user_data.clear()
@@ -43,19 +74,31 @@ async def quiz_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     return await send_new_question(update, context)
 
 
-async def send_new_question(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Selects and sends a new quiz question without repeats."""
+async def send_new_question(update: Update, context: ContextTypes.DEFAULT_TYPE,
+                            last_answer_correct: bool = False) -> int:
+    """Selects and sends a new quiz question, handles compliments, and manages quiz ending."""
     asked_questions = context.user_data.get('asked_questions', [])
     question = quiz_service.get_random_question(exclude=asked_questions)
+
     if question is None:
         score = context.user_data.get('score', 0)
-        total_questions = len(asked_questions)
-        farewell = get_farewell(score, total_questions)
+        total = len(asked_questions)
+        if score == total and total > 0:
+            await send_perfect_score_image(update)
+            return ConversationHandler.END
+        farewell = get_farewell(score, total)
         await update.message.reply_text(
-            f"Викторина завершена! Ваш итоговый счет: {score} из {total_questions}.\n{farewell}",
+            f"Викторина завершена! Ваш итоговый счет: {score} из {total}.\n{farewell}",
             reply_markup=ReplyKeyboardRemove()
         )
         return ConversationHandler.END
+
+    if last_answer_correct:
+        compliment = random.choice(COMPLIMENTS)
+        await update.message.reply_text(
+            f"✅ {compliment} Твой счет: {context.user_data['score']}.",
+            reply_markup=ReplyKeyboardRemove()
+        )
 
     asked_questions.append(question["question"])
     context.user_data["asked_questions"] = asked_questions
@@ -64,20 +107,26 @@ async def send_new_question(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     intro = random.choice(QUESTION_INTROS)
     await update.message.reply_text(
         f"{intro}\nВопрос: {question['question']}",
-        reply_markup=quiz_question_keyboard()
+        reply_markup=ReplyKeyboardRemove()
     )
     return ASKING
 
 
 async def quiz_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Checks the user's answer and handles correct/incorrect flow."""
-    text = update.message.text.strip().lower()
-    if text == "закончить викторину":
-        return await quiz_cancel(update, context)
+    """Checks the user's answer and handles correct/incorrect flow.
+    Allow quitting the quiz via keywords"""
     user = update.effective_user
     user_answer = update.message.text.strip()
-    question = context.user_data.get('current_question')
+    text = user_answer.lower()
 
+    quit_commands = {
+        "закончить викторину", "/cancel", "стоп", "выход", "end quiz", "quit"
+    }.union(END_QUIZ_BUTTONS)
+    if text in quit_commands:
+        logger.info(f"User {user.id} quit the quiz with: {user_answer}")
+        return await quiz_cancel(update, context)
+
+    question = context.user_data.get('current_question')
     if not question:
         logger.error(f"Missing question state for user {user.id} ({user.username})")
         return await send_new_question(update, context)
@@ -88,12 +137,7 @@ async def quiz_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     if is_correct:
         context.user_data["score"] += 1
-        compliment = random.choice(COMPLIMENTS)
-        await update.message.reply_text(
-            f"✅ {compliment} Твой счет: {context.user_data['score']}.\nСледующий вопрос:",
-            reply_markup=ReplyKeyboardRemove()
-        )
-        return await send_new_question(update, context)
+        return await send_new_question(update, context, last_answer_correct=True)
     else:
         failure = random.choice(FAILURES)
         await update.message.reply_text(
@@ -106,14 +150,13 @@ async def quiz_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 async def quiz_retry(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Handles the user's choice to retry the same question or get a new one."""
     text = update.message.text.strip().lower()
-    if text == "закончить викторину":
+    if text in END_QUIZ_BUTTONS:
         return await quiz_cancel(update, context)
 
     user = update.effective_user
-    choice = text
-    logger.info(f"Retry choice by {user.id}: {choice}")
+    logger.info(f"Retry choice by {user.id}: {text}")
 
-    if choice in ("еще попытка", "ещё попытка"):
+    if text in RETRY_BUTTONS:
         question = context.user_data['current_question']
         await update.message.reply_text(
             f"Попробуй еще раз!\nВопрос: {question['question']}",
@@ -121,27 +164,14 @@ async def quiz_retry(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         )
         return ASKING
 
-    if choice == "новый вопрос":
+    if text in NEW_Q_BUTTONS:
         return await send_new_question(update, context)
 
     await update.message.reply_text(
-        "Пожалуйста, выберите 'Еще попытка' или 'Новый вопрос'.",
+        f"Пожалуйста, выберите '{RETRY_BUTTON_LABEL}' или '{NEW_Q_BUTTON_LABEL}'.",
         reply_markup=quiz_retry_keyboard()
     )
     return RETRY
-
-
-async def send_perfect_score_image(update: Update) -> None:
-    """Sends a celebratory GIF or image for perfect quiz results."""
-    try:
-        with open("bot/assets/rolling_garfield.gif", "rb") as gif:
-            await update.message.reply_animation(
-                gif,
-                caption="Ты победил(а) эту викторину. Бедные вопросы даже не успели испугаться!",
-                parse_mode=ParseMode.HTML,
-            )
-    except Exception as e:
-        logger.warning(f"Could not send winner gif: {e}")
 
 
 async def quiz_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -152,7 +182,7 @@ async def quiz_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
     logger.info(f"Quiz cancelled by {user.id}. Final score: {score}")
 
     if score == total_questions and total_questions > 0:
-       await send_perfect_score_image(update)
+        await send_perfect_score_image(update)
 
     farewell = get_farewell(score, total_questions)
     await update.message.reply_text(
