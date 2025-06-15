@@ -34,7 +34,7 @@ ENGLISH_NUM_WORDS = {
     "ten": "10",
 }
 
-# Build a fast reverse dictionary for Russian forms
+
 RUSSIAN_WORD_TO_DIGIT = {}
 for digit, forms in RUSSIAN_NUM_WORDS.items():
     for form in forms:
@@ -55,7 +55,7 @@ def word_to_number(text: str) -> str:
 
     for word, digit in RUSSIAN_WORD_TO_DIGIT.items():
         text = re.sub(rf"\b{word}\b", digit, text, flags=re.IGNORECASE)
-    # Replace English number words
+
     for word, digit in ENGLISH_NUM_WORDS.items():
         text = re.sub(rf"\b{word}\b", digit, text, flags=re.IGNORECASE)
     return text

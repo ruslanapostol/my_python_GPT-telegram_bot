@@ -1,3 +1,8 @@
+"""
+Main entrypoint for the GPT-powered Telegram bot.
+Loads handlers, configures logging, starts polling.
+"""
+
 import logging
 from telegram.ext import Application, CommandHandler
 from bot.config import TG_BOT_TOKEN
@@ -31,7 +36,9 @@ def main():
 
         logger.info("Bot is polling for updates...")
         application.run_polling()
-        
+
+    except KeyboardInterrupt:
+        logger.info("Bot stopped by user (KeyboardInterrupt).")
     except Exception:
         logger.exception("An error occurred while running the bot:")
 
