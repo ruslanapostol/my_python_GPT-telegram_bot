@@ -8,29 +8,26 @@ A simple Telegram bot powered by OpenAI's GPT and written in Python 3.
 
 ---
 
-## Table of Contents
+## About NLP Features
 
-| English                       | Русский                         |
-|-------------------------------|---------------------------------|
-| [Features](#features)         | [Функционал](#функционал)       |
-| [Installation](#installation) | [Установка](#установка)         |
-| [Usage](#usage)               | [Использование](#использование) |
-| [Handlers](#handlers)         | [Обработчики](#обработчики)     |
-| [Structure](#structure)       | [Структура](#структура)         |
-| [License](#license)           | [Лицензия](#лицензия)           |
-| [Author](#author)             | [Автор](#автор)                 |
+**This bot isn’t just a simple GPT wrapper — it includes real NLP/ML logic!**  
+My `/paraphrase` command is a practical showcase of NLP:  
+it detects the language of your input (Russian, English, Spanish, Romanian) and asks GPT to generate a human-sounding paraphrase.  
+_This is my “psychologist-who-codes-NLP” moment_ 😄
 
 ---
 
 ## Features / Функционал
 
-- `/start` — Welcome message / Приветствие
-- `/help` — List of commands / Доступные команды
-- `/about` — Project info / О проекте
-- `/random` — Random fact / Случайный факт
-- `/gpt` — ChatGPT Q&A / Вопросы к GPT
-- `/quiz` — Quiz / Викторина
-- `/talk` — Persona dialog / Диалог с персонажем
+- `/start` — Welcome message / Приветствие  
+- `/help` — List of commands / Доступные команды  
+- `/about` — Project info / О проекте  
+- `/random` — Random fact / Случайный факт  
+- `/gpt` — ChatGPT Q&A / Вопросы к GPT  
+- `/quiz` — Quiz / Викторина  
+- `/talk` — Persona dialog / Диалог с персонажем  
+- `/paraphrase` — **NLP feature!** Paraphrase any text in Russian, English, Spanish, or Romanian using GPT  
+  _Моя первая NLP-функция: перефразирует текст на русском, английском, испанском или румынском (авто-определение языка)_
 
 ---
 
@@ -45,113 +42,74 @@ poetry install
 ---
 
 ## Usage / Использование
+	1.	Add environment variables:
+    TG_BOT_TOKEN=ваш_telegram_token
+    CHATGPT_TOKEN=ваш_openai_token
 
-1. **Add environment variables:**  
-   Скопируйте `.env.example` → `.env` и добавьте ваши токены:
-   ```
-   TG_BOT_TOKEN=ваш_telegram_token
-   CHATGPT_TOKEN=ваш_openai_token
-   ```
 
-2. **Run the bot:**  
-   Запуск:
+	2.	Run the bot:
+    Запуск:
+    poetry run python bot/main.py  или  python -m bot.main
 
-   ```bash
-   poetry run python bot/main.py
-   ```
-   # или
-   ```
-   python -m bot.main
-   ```
+---
+
+## NLP: Paraphrase Command / Перефразирование
+	•	/paraphrase — my showcase of NLP-in-action!
+	•	Detects input language automatically (ru/en/es/ro).
+	•	Sends your text to GPT and returns a fresh, natural-sounding paraphrase.
+	•	Try several in a row, or send /cancel to exit.
 
 ---
 
 ## Handler Overview / Обзор обработчиков
+	•	handlers/random_fact.py — Sends a random fact from file
+    Отправляет случайный факт из файла
+	•	handlers/gpt_chat.py — Q&A with ChatGPT
+    Вопрос-ответ с ChatGPT
+	•	handlers/quiz.py — Quiz logic
+    Викторина (вопросы, ответы, баллы)
+	•	handlers/talk.py — Persona/character dialog
+    Диалог с известной личностью
+	•	handlers/paraphrase.py — NLP-powered paraphrasing
+    Перефразирование текста с автоопределением языка (GPT)
 
-- `handlers/random_fact.py` — Sends a random fact from file  
-  Отправляет случайный факт из файла
+---
 
-- `handlers/gpt_chat.py` — Q&A with ChatGPT  
-  Вопрос-ответ с ChatGPT
+## Data Files / Данные
 
-- `handlers/quiz.py` — Quiz logic  
-  Викторина (вопросы, ответы, баллы)
+    personas.json:
 
-- `handlers/talk.py` — Persona/character dialog  
-  Диалог с известной личностью
+    List of available personas for /talk. Each persona has a name and a prompt that sets up ChatGPT’s character.
+    Список доступных персонажей для команды /talk. Каждый объект должен содержать поля name (имя) и prompt (стиль/характер для ChatGPT).
+
+    quiz_questions.json:
+
+    Quiz questions for /quiz. Each entry has a question and the correct answer.
+    Вопросы для викторины /quiz. Каждый объект — это пара question (вопрос) и answer (правильный ответ).
 
 ---
 
 ## Project Structure / Структура проекта
 
-```
-bot/
-  assets/          # Facts, quiz questions, personas (JSON, txt, png)
-  handlers/        # Command handlers
-  services/        # Service logic (OpenAI, personas, quiz)
-  utils/           # Helpers, keyboards
-  main.py          # Entry point
-```
+    bot/
+      assets/          # Facts, quiz questions, personas (JSON, txt, png)
+      handlers/        # Command handlers
+      services/        # Service logic (OpenAI, personas, quiz)
+      utils/           # Helpers, keyboards
+      main.py          # Entry point
+
 
 ---
 
-
-## Data Files / Данные
-
-1. `personas.json`
-   List of available personas for /talk. Each persona has a name and a prompt that sets up ChatGPT’s character.
-Format:
-[
-  {
-    "name": "Persona Name",
-    "prompt": "Instructions for ChatGPT in the persona's style"
-  },
-  ...
-]
-Example:
-[
-  {
-    "name": "Albert Einstein",
-    "prompt": "You are Albert Einstein, famous physicist. Always answer in the first person..."
-  }
-]
-Русский:
-Список доступных персонажей для команды /talk. 
-Каждый объект должен содержать поля name (имя) и prompt (стиль/характер для ChatGPT).
-
-2.` quiz_questions.json`
-Quiz questions for /quiz. Each entry has a question and the correct answer.
-Format:
-[
-  {
-    "question": "Your question here",
-    "answer": "Correct answer"
-  },
-  ...
-]
-Example:
-[
-  {
-    "question": "What is the capital of France?",
-    "answer": "Paris"
-  },
-  {
-    "question": "2 + 2?",
-    "answer": "4"
-  }
-]
-Русский:
-Вопросы для викторины /quiz. Каждый объект — это пара question (вопрос) и answer (правильный ответ).
-
-
 ## License / Лицензия
 
-Apache License 2.0
-
+    Apache License 2.0
 ---
 
 ## Author / Автор
 
-Ruslan Apostol  
-Python/NLP student, polyglot, psychologist  
-apostolruslan.python@gmail.com
+    Ruslan Apostol
+    Python/NLP student, polyglot, psychologist
+    apostolruslan.python@gmail.com
+---
+

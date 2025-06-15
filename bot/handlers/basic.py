@@ -35,6 +35,7 @@ async def start(update: Update, _context: ContextTypes.DEFAULT_TYPE):
         "/random — случайный факт\n"
         "/gpt — задать вопрос ChatGPT\n"
         "/quiz — викторина\n"
+        "/paraphrase — переформулировать текст\n"
         "/talk — диалог с известной личностью\n"
         "/help — справка"
     )
@@ -51,6 +52,7 @@ async def help_command(update: Update, _context: ContextTypes.DEFAULT_TYPE):
         "/random — случайный факт\n"
         "/gpt — спросить ChatGPT\n"
         "/quiz — викторина\n"
+        "/paraphrase — переформулировать текст\n"
         "/talk — диалог с известной личностью\n"
         "/help — эта справка"
     )
