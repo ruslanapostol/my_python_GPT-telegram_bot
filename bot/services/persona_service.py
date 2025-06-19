@@ -22,7 +22,7 @@ class PersonaService:
     def load_personas(self) -> List[Dict[str, str]]:
         """
         Loads persona definitions from a JSON file.
-        The JSON file should be a list of {"name": ..., "prompt": ...} objects.
+        The JSON file should be a list of {"name": ..., "prompt": ...} Objects.
         Returns an empty list on failure.
         """
         try:
