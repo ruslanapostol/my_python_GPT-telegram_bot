@@ -20,7 +20,7 @@ async def start(update: Update, _context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     logger.info(f"/start received from {user.id} ({user.username})")
 
-    gif_path = os.path.join(os.path.dirname(__file__), "..", "assets", "garfield.gif")
+    gif_path = os.path.join(os.path.dirname(__file__), "..", "assets", "img/garfield.gif")
     await update.message.chat.send_action(action=ChatAction.UPLOAD_PHOTO)
 
     with open(gif_path, "rb") as gif_file:

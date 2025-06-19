@@ -1,3 +1,22 @@
+"""
+Quiz command handler for the Telegram GPT bot.
+
+- Provides an interactive quiz (/quiz) session for users.
+- Loads quiz questions and answer checking logic via the quiz_service.
+- Handles multi-step user interactions: asking questions, validating answers,
+  retrying, providing compliments/feedback, and showing the final score.
+- Supports quitting at any time, with dynamic farewells and a celebratory GIF
+  for perfect scores.
+
+Designed for educational and entertainment purposes; demonstrates
+conversation state management and modular handler design in a Telegram bot.
+
+Файл-обработчик команды викторины /quiz для Telegram-бота с GPT.
+- Реализует интерактивную викторину: вопросы, проверки ответов, повтор попыток, финальная оценка.
+- Гибко управляет диалогом с пользователем, поддерживает выход в любой момент.
+- Использует динамические сообщения, GIF-изображения и мотивационные комментарии.
+"""
+
 import logging
 import random
 
@@ -57,7 +76,7 @@ async def send_perfect_score_image(update: Update) -> None:
     """
     try:
         logger.info("Trying to send perfect score GIF...")
-        with open("bot/assets/rolling_garfield.gif", "rb") as gif:
+        with open("bot/assets/img/rolling_garfield.gif", "rb") as gif:
             logger.info("GIF file opened successfully, sending...")
             await update.message.reply_animation(
                 gif,

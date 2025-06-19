@@ -1,3 +1,19 @@
+"""
+Quiz service: loading, picking, and matching quiz questions/answers for the Telegram GPT bot.
+
+- Loads quiz questions from JSON file.
+- Picks random, non-repeating questions for the quiz handler.
+- Implements "smart" answer checking (number words, fuzzy match, partial answers, unicode normalization).
+
+Сервис викторины для Telegram-бота GPT:
+- Загружает вопросы из JSON-файла.
+- Выбирает случайные (неповторяющиеся) вопросы для викторины.
+- Сравнивает ответы "умно": нормализация чисел, частичные ответы, поддержка опечаток, юникод.
+
+Usage:
+Imported as quiz_service singleton for use in handlers/quiz.py.
+"""
+
 import json
 import os
 import random
@@ -52,7 +68,7 @@ class QuizService:
         """
         Normalizes text for comparison:
         - lowercases, strips
-        - removes accents (unicode normalization)
+        - removes accents (Unicode normalization)
         - removes punctuation/non-alphanum
         """
 
@@ -90,6 +106,6 @@ class QuizService:
 
 
 QUIZ_FILE = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "assets", "quiz_questions.json")
+    os.path.join(os.path.dirname(__file__), "..", "assets", "text/quiz_questions.json")
 )
 quiz_service = QuizService(QUIZ_FILE)

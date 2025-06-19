@@ -54,7 +54,7 @@ class PersonaService:
 
 
 PERSONAS_FILE = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "assets", "personas.json")
+    os.path.join(os.path.dirname(__file__), "..", "assets", "text/personas.json")
 )
 
 persona_service = PersonaService(PERSONAS_FILE)

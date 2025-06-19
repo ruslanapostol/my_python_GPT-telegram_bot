@@ -12,7 +12,7 @@ import os
 logger = logging.getLogger(__name__)
 
 FACTS_PATH = os.path.normpath(
-    os.path.join(os.path.dirname(__file__), "..", "assets", "facts.txt")
+    os.path.join(os.path.dirname(__file__), "..", "assets", "text/facts.txt")
 )
 
 def load_facts():
@@ -21,7 +21,7 @@ def load_facts():
     Returns a list of non-empty lines.
     """
     try:
-        logger.debug(f"Looking for facts.txt at {FACTS_PATH}")
+        logger.debug(f"Looking for text/facts.txt at {FACTS_PATH}")
         with open(FACTS_PATH, "r", encoding="utf-8") as file:
             facts = [line.strip() for line in file if line.strip()]
             logger.info(f"Loaded {len(facts)} facts from file")
